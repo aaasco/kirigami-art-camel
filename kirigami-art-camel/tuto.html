@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tutoriel : Créer son Kirigami 3D</title>
+    <title>Tutoriel - Guide pour faire un kirigami à partir d'un réel objet</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -11,6 +11,7 @@
             font-family: 'Poppins', sans-serif;
             background-color: #fefaf0;
             color: #2d2d2d;
+            scroll-behavior: smooth;
         }
 
         .bg-shapes {
@@ -36,7 +37,6 @@
             box-shadow: 0 8px 32px rgba(188, 108, 37, 0.05);
         }
 
-        /* Style spécifique pour la Navbar Flottante */
         #main-nav {
             position: fixed;
             top: 20px;
@@ -44,159 +44,425 @@
             right: 20px;
             z-index: 100;
             border-radius: 2rem;
-            transition: transform 0.1s ease-out; /* Pour un mouvement fluide vers la souris */
         }
 
         .step-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .step-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(188, 108, 37, 0.12);
+            transition: transform 0.3s ease;
+            margin-bottom: 4rem;
         }
 
         .icon-box {
             background: linear-gradient(135deg, #bc6c25, #d4a373);
-            width: 50px; height: 50px;
+            width: 40px; height: 40px;
             display: flex; align-items: center; justify-content: center;
-            border-radius: 12px;
+            border-radius: 10px;
             color: white;
             font-weight: 800;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
-        .software-tag {
-            display: inline-block;
-            padding: 2px 10px;
-            background: rgba(188, 108, 37, 0.1);
-            color: #bc6c25;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-right: 5px;
-            margin-bottom: 5px;
+        .node-item {
+            border-left: 3px solid #bc6c25;
+            padding-left: 1.5rem;
+            margin-bottom: 2.5rem;
         }
+
+        .note-box {
+            background: rgba(188, 108, 37, 0.05);
+            border-left: 4px solid #bc6c25;
+            padding: 1.5rem;
+            border-radius: 0 1rem 1rem 0;
+            font-size: 0.95rem;
+            margin: 1.5rem 0;
+        }
+
+        /* --- Styles Carrousel --- */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            background: #1a1a1a;
+            aspect-ratio: 16/10;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            margin: 1.5rem 0;
+        }
+        .carousel-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            color: white;
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+        .carousel-btn:hover { background: rgba(255,255,255,0.4); }
+        .prev-btn { left: 15px; }
+        .next-btn { right: 15px; }
+        .carousel-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: 0.3s; }
+        .dot.active { background: white; width: 20px; border-radius: 4px; }
     </style>
 </head>
-<body class="pt-24"> <!-- Padding-top pour ne pas cacher le contenu sous la nav fixe -->
+<body class="pt-28">
 
     <div class="bg-shapes">
         <div class="shape shape-1"></div>
         <div class="shape shape-2"></div>
     </div>
 
-    <!-- Navigation Interactive qui suit le pointeur -->
-    <nav id="main-nav" class="glass px-8 py-4 flex justify-between items-center max-w-6xl mx-auto">
+    <!-- Navigation -->
+    <nav id="main-nav" class="glass px-8 py-4 flex justify-between items-center max-w-6xl mx-auto shadow-sm">
         <a href="accueil.html" class="font-extrabold text-amber-900 tracking-tighter text-xl">🐪 KirigamiArt</a>
-        <a href="accueil.html" class="px-5 py-2 bg-white/50 rounded-full text-amber-800 text-sm font-bold hover:bg-white transition border border-white/50">← Retour à l'accueil</a>
+        <a href="accueil.html" class="px-6 py-2 bg-white/50 rounded-full text-amber-800 text-sm font-bold hover:bg-white transition border border-white/50 shadow-sm">← Retour à l'accueil</a>
     </nav>
 
-    <!-- Header -->
-    <header class="max-w-4xl mx-auto px-6 py-16 text-center">
-        <span class="text-amber-700 font-bold tracking-widest text-xs uppercase mb-4 block">Workflow Technique Complet</span>
-        <h1 class="text-5xl font-extrabold text-stone-900 leading-tight mb-6">Guide : Du Réel au <span class="text-amber-600">Papier</span></h1>
-        <p class="text-stone-600 text-lg">Suivez les étapes pour reproduire notre sculpture de dromadaire.</p>
+    <!-- Header retranscrit -->
+    <header class="max-w-4xl mx-auto px-6 py-12 text-center">
+        <h1 class="text-5xl font-extrabold text-stone-900 leading-tight mb-4">Tutoriel</h1>
+        <p class="text-amber-700 text-2xl font-semibold mb-6">Guide pour faire un kirigami à partir d'un réel objet</p>
     </header>
 
-    <main class="max-w-5xl mx-auto px-6 pb-24 space-y-12">
+    <main class="max-w-5xl mx-auto px-6 pb-24 space-y-20">
 
-        <!-- Étape 1 : Capture 3D -->
-        <section class="glass p-10 rounded-[2.5rem] step-card flex flex-col md:flex-row gap-10 items-center">
-            <div class="md:w-1/2">
-                <div class="icon-box">1</div>
-                <div class="mb-3">
-                    <span class="software-tag">Abound 3D</span>
+        <!-- 1. Capture 3D -->
+        <section class="glass p-10 rounded-[3rem] step-card">
+            <div class="flex flex-col md:flex-row gap-12 items-center">
+                <div class="md:w-1/2">
+                    <div class="icon-box">1</div>
+                    <h2 class="text-3xl font-extrabold mb-6 text-stone-900">Capture 3D de l'objet</h2>
+                    <p class="text-stone-700 leading-relaxed text-lg">
+                        Tout d'abord, nous avons utilisé <strong>Abound 3D</strong> (que nous recommandons car un meilleur résultat 3D qu'avec Agisoft Metashape en termes de texture) pour modéliser en 3D notre sujet (ici le dromadaire).
+                    </p>
                 </div>
-                <h2 class="text-2xl font-bold mb-4">Capture de l'Objet Réel</h2>
-                <p class="text-stone-600 leading-relaxed">
-                    Utilisez l'application <strong>Abound 3D</strong> pour effectuer un scan complet de la peluche. Prenez des photos à 360° pour générer le maillage brut.
-                </p>
-            </div>
-            <div class="md:w-1/2 rounded-2xl overflow-hidden bg-stone-200">
-                <img src="./images/agisoft.png" alt="Scan initial" class="w-full h-64 object-contain">
+                <div class="md:w-1/2">
+                    <div class="carousel-container" id="carousel-capture">
+                        <div class="carousel-track">
+                            <div class="carousel-slide"><img src="./images/tutomeshlab.png" alt="Modèle 3D Dromadaire"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- Étape 2 : Nettoyage -->
-        <section class="glass p-10 rounded-[2.5rem] step-card flex flex-col md:flex-row-reverse gap-10 items-center">
-            <div class="md:w-1/2">
-                <div class="icon-box">2</div>
-                <div class="mb-3">
-                    <span class="software-tag">Meshlab</span>
-                    <span class="software-tag">Houdini</span>
+        <!-- 2. Nettoyage Procédural -->
+        <section class="glass p-10 rounded-[3rem] step-card">
+            <div class="icon-box">2</div>
+            <h2 class="text-3xl font-extrabold mb-8 text-stone-900">Nettoyage Procédural</h2>
+            
+            <div class="space-y-12">
+                <div>
+                    <p class="text-stone-700 leading-relaxed mb-6">
+                        Tout d'abord, nous importons dans l'application <strong>MeshLab</strong> le modèle 3D (.obj). Depuis l'interface de MeshLab, il y a en haut à droite des options de sélections et de suppressions. 
+                    </p>
+                    <div class="bg-amber-50 p-6 rounded-2xl border-l-4 border-amber-400 mb-6">
+                        <p class="text-stone-700 leading-relaxed italic">
+                            A l'aide de "Select Vertices" on sélectionne les zones à supprimer, puis avec "Delete Selected Vertices", nous appliquons la suppression de la zone sélectionnée.
+                        </p>
+                    </div>
+
+                    <!-- Carrousel MeshLab -->
+                    <div class="carousel-container" id="carousel-meshlab">
+                        <button class="carousel-btn prev-btn">❮</button>
+                        <div class="carousel-track">
+                            <div class="carousel-slide"><img src="./images/tutomeshlab.png" alt="Nettoyage 1"></div>
+                            <div class="carousel-slide"><img src="./images/tutomeshlab1.png" alt="Nettoyage 2"></div>
+                            <div class="carousel-slide"><img src="./images/tutomeshlab2.png" alt="Nettoyage 3"></div>
+                            <div class="carousel-slide"><img src="./images/tutomeshlab3.png" alt="Nettoyage 4"></div>
+                        </div>
+                        <button class="carousel-btn next-btn">❯</button>
+                        <div class="carousel-dots"></div>
+                    </div>
+                    
+                    <p class="text-stone-700 leading-relaxed mb-8">
+                        Ceci constitue la première étape du nettoyage procédural. MeshLab ne nettoie pas l'intégralité du modèle, il reste encore des trous à boucher dans le maillage. Pour cela, nous utilisons le logiciel <strong>Houdini</strong>, depuis lequel nous allons programmer le nettoyage du maillage de notre sujet.
+                    </p>
                 </div>
-                <h2 class="text-2xl font-bold mb-4">Nettoyage & Réparation</h2>
-                <p class="text-stone-600 leading-relaxed mb-4">
-                    Passez par <strong>Meshlab</strong> pour supprimer les artefacts, puis par <strong>Houdini</strong> pour boucher les trous (workflow VDB).
-                </p>
-            </div>
-            <div class="md:w-1/2 rounded-2xl overflow-hidden">
-                <img src="./images/houdiniprogramming.png" class="w-full">
+
+                <div class="pt-8">
+                    <h3 class="text-2xl font-bold mb-6 text-amber-900">Logiciel Houdini</h3>
+                    <div class="mt-8">
+                        <p class="text-stone-700 leading-relaxed mb-10">
+                            L’interface de Houdini peut faire peur au départ, mais nous allons surtout travailler avec le coin droit. Dans la partie inférieure de ce coin, nous pouvons, en appuyant sur le clic droit, faire apparaître un menu contenant une barre de recherche des fonctions (noeuds) que nous souhaitons. Pour notre cas, nous aurons besoin de :
+                        </p>
+                        <img src="./images/houdiniinterface.png" class="rounded-xl shadow-md max-w-full h-auto mb-12" alt="Houdini Interface">
+                    </div>
+
+                    <div class="space-y-12">
+                        <div class="node-item">
+                            <h4 class="font-bold text-amber-700 text-xl">file1 (chameau.obj)</h4>
+                            <p class="text-stone-600">Ce nœud permet d'importer un fichier externe dans Houdini. Dans notre cas, nous chargerons un modèle 3D de chameau au format .obj.</p>
+                        </div>
+
+                        <div class="node-item">
+                            <h4 class="font-bold text-amber-700 text-xl">clean1</h4>
+                            <p class="text-stone-600 mb-4">Ce nœud est utilisé pour nettoyer la géométrie du modèle importé. Il permet de supprimer les éléments indésirables, les points inutiles ou les primitives malformées, garantissant ainsi une géométrie plus propre et prête pour le traitement.</p>
+                            <img src="./images/houdiniclean1.png" class="rounded-xl shadow-md max-w-full">
+                        </div>
+
+                        <div class="node-item">
+                            <h4 class="font-bold text-amber-700 text-xl">polyfill1</h4>
+                            <p class="text-stone-600 mb-4">Ce nœud sert à remplir les trous présents dans la géométrie. Si le modèle a des zones ouvertes ou des faces manquantes, ce nœud les comblera en générant des faces et des arêtes afin d’obtenir une surface fermée et continue.</p>
+                            <img src="./images/houdinipolyfill.png" class="rounded-xl shadow-md max-w-full">
+                        </div>
+
+                        <div class="node-item">
+                            <h4 class="font-bold text-amber-700 text-xl">vdbfrompolygons1</h4>
+                            <p class="text-stone-600 mb-4">Ce nœud convertit un modèle polygonal en un volume VDB (Volumetric Data Block). Il transforme la géométrie en un nuage de voxels, ce qui est particulièrement utile pour les simulations de fluides ou la création d’effets volumétriques.</p>
+                            <img src="./images/houdinivdbfrompolygon.png" class="rounded-xl shadow-md max-w-full">
+                        </div>
+
+                        <div class="node-item">
+                            <h4 class="font-bold text-amber-700 text-xl">vdbreshapesdf1</h4>
+                            <p class="text-stone-600 mb-4">Ce nœud est utilisé pour remodeler ou affiner un champ SDF (Signed Distance Field) à partir du volume VDB généré précédemment. Il ajuste la forme du volume, corrige les imperfections et améliore les détails.</p>
+                            <img src="./images/houdinivdbreshapesdf.png" class="rounded-xl shadow-md max-w-full">
+                        </div>
+
+                        <div class="node-item">
+                            <h4 class="font-bold text-amber-700 text-xl">convertvdb1</h4>
+                            <p class="text-stone-600 mb-4">Ce nœud permet de convertir un volume VDB en une autre forme de données, comme une géométrie classique ou un autre type de volume, en fonction des besoins de votre projet.</p>
+                            <img src="./images/houdiniconvertvdb.png" class="rounded-xl shadow-md max-w-full">
+                        </div>
+
+                        <div class="node-item">
+                            <h4 class="font-bold text-amber-700 text-xl">remesh1</h4>
+                            <p class="text-stone-600 mb-4">Ce nœud permet de refaire le maillage de l’objet 3D. Il réorganise les faces et les arêtes pour une meilleure topologie, ce qui est essentiel pour obtenir une géométrie propre, souvent en ajustant la résolution du maillage.</p>
+                            <img src="./images/houdiniremesh1.png" class="rounded-xl shadow-md max-w-full">
+                        </div>
+
+                        <div class="node-item">
+                            <h4 class="font-bold text-amber-700 text-xl">rop_geometry1 (chameau_cleaned.obj)</h4>
+                            <p class="text-stone-600">Ce nœud permet d'exporter la géométrie finale après avoir appliqué tous les traitements. Dans ce cas, il exporte la version nettoyée et modifiée du modèle sous le nom chameau_cleaned.obj.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-12">
+                        <p class="text-stone-700 font-medium mb-6">Les nœuds sont assemblés dans un ordre précis, mais vous avez la liberté de les organiser comme vous le souhaitez pour répondre aux besoins de votre projet.</p>
+                        <img src="./images/houdiniprogramming.png" class="rounded-2xl shadow-xl w-full" alt="Assemblage des noeuds Houdini">
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- Étape 3 : Graphite -->
-        <section class="glass p-10 rounded-[2.5rem] step-card flex flex-col md:flex-row gap-10 items-center">
-            <div class="md:w-1/2">
-                <div class="icon-box">3</div>
-                <div class="mb-3">
-                    <span class="software-tag">Graphite</span>
+        <!-- 3. Low-Poly Graphite -->
+        <section class="glass p-10 rounded-[3rem] step-card">
+            <div class="icon-box">3</div>
+            <h2 class="text-3xl font-extrabold mb-8 text-stone-900">Low-Poly Graphite</h2>
+            
+            <div class="space-y-10">
+                <div class="max-w-4xl">
+                    <p class="text-stone-700 leading-relaxed text-lg mb-8">
+                        Le modèle que nous avons peaufiné sur Houdini va subir une triangulation afin d’apporter une esthétique Kirigami. Pour ce faire, nous avons réduit les points de 30000 à 300 via le menu <strong>Surface > Remesh > remesh smooth > nb points</strong>.
+                    </p>
+                    
+                    <img src="./images/tutographite1.png" class="rounded-2xl shadow-xl w-full mb-10" alt="Réglages Graphite">
+
+                    <p class="text-stone-700 leading-relaxed text-lg mb-8">
+                        N’oubliez pas de décocher l’affichage du maillage de base dans le menu à gauche de la fenêtre Graphite pour voir le résultat !
+                    </p>
+                    
+                    <img src="./images/tutographite2.png" class="rounded-2xl shadow-xl w-full" alt="Résultat Low Poly Graphite">
                 </div>
-                <h2 class="text-2xl font-bold mb-4">Triangulation (Low-Poly)</h2>
-                <p class="text-stone-600 leading-relaxed">
-                    Réduisez le maillage dans <strong>Graphite</strong> pour obtenir un nombre de facettes pliables (environ 150 triangles).
-                </p>
-            </div>
-            <div class="md:w-1/2 grid grid-cols-2 gap-2">
-                <img src="./images/graphite1.png" class="rounded-xl">
-                <img src="./images/graphite2.png" class="rounded-xl">
             </div>
         </section>
 
-        <!-- Étape 4 : Pepakura -->
-        <section class="glass p-10 rounded-[2.5rem] step-card flex flex-col md:flex-row-reverse gap-10 items-center">
-            <div class="md:w-1/2">
-                <div class="icon-box">4</div>
-                <div class="mb-3">
-                    <span class="software-tag">Pepakura Designer</span>
-                </div>
-                <h2 class="text-2xl font-bold mb-4">Le Patron 2D</h2>
-                <p class="text-stone-600 leading-relaxed mb-4">
-                    Dépliez le modèle dans <strong>Pepakura</strong>, répartissez les pièces et ajoutez les languettes.
+        <!-- 4. Dépliage & Patron -->
+        <section class="glass p-10 rounded-[3rem] step-card">
+            <div class="icon-box">4</div>
+            <h2 class="text-3xl font-extrabold mb-8 text-stone-900">Dépliage & Patron</h2>
+            
+            <div class="space-y-8">
+                <p class="text-stone-700 leading-relaxed">
+                    Maintenant que le modèle est low-poly, on peut procéder à son dépliage dans Pepakura. Si vous n’avez pas au préalable inversé les normales du modèle sur MeshLab avant de passer sur Pepakura, vous pouvez valider l’option <strong>“Flip”</strong> pour avoir un meilleur affichage.
                 </p>
-            </div>
-            <div class="md:w-1/2 rounded-2xl overflow-hidden">
-                <img src="./images/pepakura2.png" class="w-full">
+
+                <p class="text-stone-700 leading-relaxed italic border-l-4 border-amber-400 pl-4">Pour la seconde option, faites juste finish :</p>
+                
+                <p class="text-stone-700 leading-relaxed">
+                    Ajustez enfin la taille selon vos besoins, dans notre cas nous avons fixé la hauteur à 36 cm.
+                </p>
+
+                <p class="text-stone-700 leading-relaxed">
+                    Sur la barre supérieure de la fenêtre, nous avons l’option <strong>“Unfold” (déplier)</strong> que nous allons appliquer sur le modèle.
+                </p>
+
+                <div class="carousel-container" id="carousel-pepakura">
+                    <button class="carousel-btn prev-btn">❮</button>
+                    <div class="carousel-track">
+                        <div class="carousel-slide"><img src="./images/tutopepakura5.png" alt="Réglages Pepakura"></div>
+                        <div class="carousel-slide"><img src="./images/tutopepakura1.png" alt="Dépliage Pepakura"></div>
+                        <div class="carousel-slide"><img src="./images/tutopepakura2.png" alt="Dépliage Pepakura"></div>
+                    </div>
+                    <button class="carousel-btn next-btn">❯</button>
+                    <div class="carousel-dots"></div>
+                </div>
+
+                <p class="text-stone-700 leading-relaxed">
+                    Ce n’est pas fini, nous avons des soucis au niveau des segments. Certains sont superposés, ce qui constitue une difficulté pour la découpe et l’assemblage à l’avenir. C’est là qu’intervient l’option de séparer des faces, dans la barre supérieure de la fenêtre de Pepakura.
+                </p>
+
+                <div class="carousel-container" id="carousel-pepakura-bis">
+                    <button class="carousel-btn prev-btn">❮</button>
+                    <div class="carousel-track">
+                        <div class="carousel-slide"><img src="./images/tutopepakura3-1.png" alt="Réglages Pepakura"></div>
+                        <div class="carousel-slide"><img src="./images/tutopepakura3.png" alt="Dépliage Pepakura"></div>
+                        <div class="carousel-slide"><img src="./images/tutopepakura4.png" alt="Réglages Pepakura"></div>
+                    </div>
+                    <button class="carousel-btn next-btn">❯</button>
+                    <div class="carousel-dots"></div>
+                </div>
+
+                <div class="bg-amber-50 p-8 rounded-2xl border-l-4 border-amber-400">
+                    <p class="text-stone-700 leading-relaxed mb-6">
+                        Si vous êtes novices, il est recommandé de séparer dès que vous avez un doute, quitte à avoir plus de segments à assembler pour ne pas avoir de complications dans l’assemblage. Chaque segment doit entrer dans le grillage, dont chaque case correspond à une feuille A4. Veillez à ne pas coller les segments aux bords des cases pour une impression optimale. Enfin, dans le menu 2D Layout, pensez à cocher <strong>“Show Edge ID”</strong> pour reconnaître les différentes faces qui doivent être collées les unes aux autres.
+                    </p>
+                    <p class="text-stone-700 leading-relaxed">
+                        Une fois vos segments correctement réorganisés, vous pouvez exporter en PDF.
+                    </p>
+                </div>
+
+                <div class="note-box">
+                    <strong>Note Importante :</strong> Notez que vous ne pourrez pas sauvegarder votre modèle découpé et déplié sans licence, donc conservez votre projet Pepakura ouvert pour l’assemblage. Il est important de visualiser le modèle qui vous servira de repère.
+                </div>
+
+                <div class="carousel-container" id="carousel-pepakura-tris">
+                    <button class="carousel-btn prev-btn">❮</button>
+                    <div class="carousel-track">
+                        <div class="carousel-slide"><img src="./images/edgeid.png" alt="Réglages Pepakura"></div>
+                        <div class="carousel-slide"><img src="./images/printtopdf.png" alt="Dépliage Pepakura"></div>
+                    </div>
+                    <button class="carousel-btn next-btn">❯</button>
+                    <div class="carousel-dots"></div>
+                </div>
+
             </div>
         </section>
 
-        <!-- Étape 5 : Réel -->
-        <section class="glass p-10 rounded-[2.5rem] step-card flex flex-col md:flex-row gap-10 items-center">
-            <div class="md:w-1/2">
-                <div class="icon-box">5</div>
-                <div class="mb-3">
-                    <span class="software-tag">Imprimante</span>
-                    <span class="software-tag">Cutter</span>
-                </div>
-                <h2 class="text-2xl font-bold mb-4">Assemblage Final</h2>
-                <p class="text-stone-600 leading-relaxed">
-                    Imprimez sur papier 180g, découpez et collez chaque facette avec soin.
+        <!-- 5. Assemblage manuel -->
+        <section class="glass p-10 rounded-[3rem] step-card" id="assemblage">
+            <div class="icon-box">5</div>
+            <h2 class="text-3xl font-extrabold mb-8 text-stone-900">Assemblage manuel</h2>
+            
+            <div class="space-y-10">
+                <p class="text-stone-700 leading-relaxed">
+                    Pour l'assemblage, privilégiez du papier un peu plus épais, et paramétrez si nécessaire votre imprimante ou Pepakura pour épaissir les contours des différents segments (<strong>File > Print Settings</strong>). Pour épaissir, privilégiez le <strong>Vector Print</strong> (en tout cas ça a fonctionné pour nous).
                 </p>
-            </div>
-            <div class="md:w-1/2 grid grid-cols-2 gap-2">
-                <img src="./images/assemblage00.jpg" class="rounded-xl">
-                <img src="./images/assemblage4.jpg" class="rounded-xl">
+
+                <img src="./images/printsettings.png" class="rounded-2xl shadow-xl w-full" alt="">
+
+                <div class="p-6 bg-white/40 rounded-2xl border border-amber-200">
+                    <p class="text-stone-700 font-medium italic text-center">
+                        Conseil d'assemblage : Pour l’assemblage manuel, je vous conseille de commencer par le haut, sinon vous vous retrouverez bloqués au bout d’un moment. Pour le découpage, utilisez un cutter et une règle de préférence pour être davantage plus précis. Cette étape vous prendra beaucoup de temps et de patience, alors courage !
+                    </p>
+                </div>
             </div>
         </section>
 
     </main>
 
-    <footer class="text-center py-12 border-t border-amber-200/30">
-        <p class="text-amber-900 font-bold">Projet Réalisé par Ahmed ABDOU & Mahamoud TOURE</p>
+    <footer class="text-center py-16 border-t border-amber-200/30">
+        <p class="text-amber-900 font-bold tracking-wide">© 2026 Projet Kirigami - Ahmed ABDOU & Mahamoud TOURE</p>
+        <p class="text-stone-400 text-xs mt-2 uppercase tracking-widest">Document technique - OUAP-4117</p>
     </footer>
 
     <script>
+        function initCarousel(id) {
+            const container = document.getElementById(id);
+            if (!container) return;
 
+            const track = container.querySelector('.carousel-track');
+            const slides = Array.from(track.children);
+            const nextBtn = container.querySelector('.next-btn');
+            const prevBtn = container.querySelector('.prev-btn');
+            const dotContainer = container.querySelector('.carousel-dots');
+            
+            if (slides.length <= 1) {
+                if (nextBtn) nextBtn.style.display = 'none';
+                if (prevBtn) prevBtn.style.display = 'none';
+                return;
+            }
+
+            let currentIndex = 0;
+
+            if (dotContainer) {
+                // Purge du container de points avant ré-initialisation pour éviter les doublons
+                dotContainer.innerHTML = '';
+                slides.forEach((_, i) => {
+                    const dot = document.createElement('div');
+                    dot.className = `dot ${i === 0 ? 'active' : ''}`;
+                    dot.addEventListener('click', () => moveToSlide(i));
+                    dotContainer.appendChild(dot);
+                });
+            }
+
+            function updateDots(index) {
+                if (!dotContainer) return;
+                const dots = Array.from(dotContainer.children);
+                dots.forEach(d => d.classList.remove('active'));
+                if (dots[index]) dots[index].classList.add('active');
+            }
+
+            function moveToSlide(index) {
+                currentIndex = index;
+                track.style.transform = `translateX(-${index * 100}%)`;
+                updateDots(index);
+            }
+
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    currentIndex = (currentIndex + 1) % slides.length;
+                    moveToSlide(currentIndex);
+                });
+            }
+
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+                    moveToSlide(currentIndex);
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialisation automatique de tous les carrousels ayant un ID
+            document.querySelectorAll('.carousel-container[id]').forEach(container => {
+                initCarousel(container.id);
+            });
+        });
     </script>
 </body>
 </html>
